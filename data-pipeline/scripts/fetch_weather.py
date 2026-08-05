@@ -32,7 +32,6 @@ def fetch_weather():
         "weather_code": current["weather_code"],
     }
 
-
 def insert_into_snowflake(reading):
     """Open a connection, insert one row, close the connection."""
     conn = snowflake.connector.connect(
@@ -64,7 +63,6 @@ def insert_into_snowflake(reading):
         print(f"Inserted reading for {reading['city']} at {reading['observed_at']}")
     finally:
         conn.close()
-
 
 if __name__ == "__main__":
     reading = fetch_weather()
