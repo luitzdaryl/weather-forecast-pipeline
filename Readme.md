@@ -1,0 +1,101 @@
+Good instinct to bring up now — yes, this is exactly the right checkpoint to start it, same reasoning as before: capture progress while it's fresh, rather than trying to reconstruct the whole story from memory at the end.
+
+## README.md — here's a starting version
+
+Copy this into `README.md` at your repo root (`weather-forecast-pipeline/README.md`):
+
+```markdown
+# Weather Forecast Pipeline
+
+A data engineering pipeline that ingests live weather data, stores it in a cloud data warehouse, and (eventually) trains a forecasting model on top of it. Built as a hands-on project to learn the modern data stack: **Snowflake**, **Apache Airflow**, **Apache Spark**, and **Apache Kafka**.
+
+## Architecture
+
+```
+Open-Meteo API (live weather data)
+        │
+        ▼
+  Python ingestion script
+        │
+        ▼
+   Snowflake (data warehouse)
+        ▲
+        │
+  Apache Airflow (schedules the ingestion)
+```
+
+*(Spark and Kafka join this diagram in later milestones — see Roadmap below.)*
+
+## Tech Stack
+
+- **Snowflake** — cloud data warehouse, stores all historical weather readings
+- **Python** — fetches data from [Open-Meteo](https://open-meteo.com) (free, no API key required) and loads it into Snowflake
+- **Apache Airflow** — orchestrates and schedules the ingestion pipeline *(in progress)*
+- **Apache Spark** — data transformation/cleaning at scale *(planned)*
+- **Apache Kafka** — real-time streaming ingestion *(planned)*
+- **Scikit-learn / XGBoost** — forecasting model *(planned)*
+- **Streamlit** — dashboard + natural-language chatbot over the data, powered by a local Ollama model *(planned)*
+
+## Project Structure
+
+```
+weather-forecast-pipeline/
+├── data-pipeline/
+│   ├── sql/              # Snowflake schema setup scripts
+│   ├── scripts/           # Python ingestion scripts
+│   ├── .env.example       # template for required credentials
+│   └── requirements.txt
+├── ml-pipeline/            # forecasting model (coming in a later milestone)
+└── README.md
+```
+
+## Setup
+
+### 1. Snowflake
+
+Run `data-pipeline/sql/01_setup_warehouse_db_table.sql` in a Snowflake worksheet to create the warehouse, database, schema, and table.
+
+### 2. Python ingestion script
+
+```bash
+cd data-pipeline
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+Copy `.env.example` to `.env` and fill in your own Snowflake credentials:
+
+```bash
+cp .env.example .env
+```
+
+Run the script manually:
+
+```bash
+python3 scripts/fetch_weather.py
+```
+
+## Roadmap
+
+- [x] **Milestone 1** — Batch ingestion: Python script → Snowflake (manual run)
+- [ ] **Milestone 1b** — Automate ingestion on a schedule with Apache Airflow
+- [ ] **Milestone 2** — Add Apache Spark for data transformation
+- [ ] **Milestone 3** — Add Apache Kafka for real-time streaming ingestion
+- [ ] **Milestone 4** — Train a forecasting model, build a Streamlit dashboard
+- [ ] **Milestone 5** — Add a natural-language chatbot over the data (local Ollama)
+
+## License
+
+MIT
+```
+
+One thing worth doing right now, since I referenced it in the README: create `data-pipeline/requirements.txt` with your pinned versions (same `pip freeze` trick from before):
+
+```bash
+pip freeze > requirements.txt
+```
+
+This is the Python equivalent of the `sql/` file — it lets anyone cloning your repo reproduce your exact environment, instead of guessing which packages to install.
+
+---
