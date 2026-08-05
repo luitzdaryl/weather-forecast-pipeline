@@ -89,13 +89,3 @@ python3 scripts/fetch_weather.py
 
 MIT
 ```
-
-One thing worth doing right now, since I referenced it in the README: create `data-pipeline/requirements.txt` with your pinned versions (same `pip freeze` trick from before):
-
-```bash
-pip freeze > requirements.txt
-```
-
-This is the Python equivalent of the `sql/` file — it lets anyone cloning your repo reproduce your exact environment, instead of guessing which packages to install.
-
----
