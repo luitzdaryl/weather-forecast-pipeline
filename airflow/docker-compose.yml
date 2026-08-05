@@ -14,7 +14,8 @@ services:
     restart: always
 
   airflow-init:
-    image: apache/airflow:2.10.4-python3.11
+    build: .
+    image: weather-airflow:latest
     depends_on:
       - postgres
     environment:
@@ -24,14 +25,14 @@ services:
     command: -c "airflow db migrate && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com"
 
   airflow-webserver:
-    image: apache/airflow:2.10.4-python3.11
+    build: .
+    image: weather-airflow:latest
     depends_on:
       - airflow-init
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      _PIP_ADDITIONAL_REQUIREMENTS: 'snowflake-connector-python python-dotenv requests'
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
@@ -41,14 +42,14 @@ services:
     command: webserver
 
   airflow-scheduler:
-    image: apache/airflow:2.10.4-python3.11
+    build: .
+    image: weather-airflow:latest
     depends_on:
       - airflow-init
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      _PIP_ADDITIONAL_REQUIREMENTS: 'snowflake-connector-python python-dotenv requests'
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
