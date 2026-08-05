@@ -1,10 +1,3 @@
-Good instinct to bring up now — yes, this is exactly the right checkpoint to start it, same reasoning as before: capture progress while it's fresh, rather than trying to reconstruct the whole story from memory at the end.
-
-## README.md — here's a starting version
-
-Copy this into `README.md` at your repo root (`weather-forecast-pipeline/README.md`):
-
-```markdown
 # Weather Forecast Pipeline
 
 A data engineering pipeline that ingests live weather data, stores it in a cloud data warehouse, and (eventually) trains a forecasting model on top of it. Built as a hands-on project to learn the modern data stack: **Snowflake**, **Apache Airflow**, **Apache Spark**, and **Apache Kafka**.
@@ -41,11 +34,11 @@ Open-Meteo API (live weather data)
 ```
 weather-forecast-pipeline/
 ├── data-pipeline/
-│   ├── sql/              # Snowflake schema setup scripts
-│   ├── scripts/           # Python ingestion scripts
-│   ├── .env.example       # template for required credentials
+│   ├── sql/                # Snowflake schema setup scripts
+│   ├── scripts/             # Python ingestion scripts
+│   ├── .env.example         # template for required credentials
 │   └── requirements.txt
-├── ml-pipeline/            # forecasting model (coming in a later milestone)
+├── ml-pipeline/              # forecasting model (coming in a later milestone)
 └── README.md
 ```
 
@@ -88,4 +81,3 @@ python3 scripts/fetch_weather.py
 ## License
 
 MIT
-```
