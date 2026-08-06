@@ -16,11 +16,10 @@ def run_pipeline():
     print("Fetched:", reading)
     insert_into_snowflake(reading)
 
-
 default_args = {
     "owner": "airflow",
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5),
+    "retries": 3,                          # was 1 — more attempts for transient failures
+    "retry_delay": timedelta(minutes=2),   # was 5 — recover faster
 }
 
 with DAG(
