@@ -72,7 +72,7 @@ python3 scripts/fetch_weather.py
 ## Roadmap
 
 - [x] **Milestone 1** — Batch ingestion: Python script → Snowflake (manual run)
-- [ ] **Milestone 1b** — Automate ingestion on a schedule with Apache Airflow
+- [x] **Milestone 1b** — Automate ingestion on a schedule with Apache Airflow
 - [ ] **Milestone 2** — Add Apache Spark for data transformation
 - [ ] **Milestone 3** — Add Apache Kafka for real-time streaming ingestion
 - [ ] **Milestone 4** — Train a forecasting model, build a Streamlit dashboard
