@@ -69,6 +69,17 @@ Run the script manually:
 python3 scripts/fetch_weather.py
 ```
 
+### 3. Airflow (automated scheduling)
+
+The ingestion script runs automatically every hour via Apache Airflow, orchestrated in Docker.
+
+```bash
+cd airflow
+docker compose up --build
+```
+
+Open `http://localhost:8081` (username/password: `admin` / `admin`) to view and trigger the `weather_ingestion` DAG.
+
 ## Roadmap
 
 - [x] **Milestone 1** — Batch ingestion: Python script → Snowflake (manual run)
