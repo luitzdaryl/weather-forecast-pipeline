@@ -23,7 +23,7 @@ Open-Meteo API (live weather data)
 
 - **Snowflake** — cloud data warehouse, stores all historical weather readings
 - **Python** — fetches data from [Open-Meteo](https://open-meteo.com) (free, no API key required) and loads it into Snowflake
-- **Apache Airflow** — orchestrates and schedules the ingestion pipeline *(in progress)*
+- **Apache Airflow** — orchestrates and schedules the ingestion pipeline, running hourly in Docker
 - **Apache Spark** — data transformation/cleaning at scale *(planned)*
 - **Apache Kafka** — real-time streaming ingestion *(planned)*
 - **Scikit-learn / XGBoost** — forecasting model *(planned)*
