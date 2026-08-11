@@ -17,7 +17,7 @@ spark = (
     SparkSession.builder.appName("SnowflakeRead")
     .config(
         "spark.jars.packages",
-        "net.snowflake:snowflake-jdbc:3.19.0,net.snowflake:spark-snowflake_2.12:2.16.0-spark_3.4",
+        "net.snowflake:snowflake-jdbc:3.19.0,net.snowflake:spark-snowflake_2.13:3.1.1",
     )
     .getOrCreate()
 )
