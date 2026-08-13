@@ -3,7 +3,12 @@ from pyspark.sql import SparkSession, Window
 from pyspark.sql import functions as F
 from dotenv import load_dotenv
 
-load_dotenv("../data-pipeline/.env")
+# Resolve the .env path relative to THIS FILE's location, not the current
+# working directory — makes this work identically whether run standalone
+# (python3 scripts/transform_weather.py) or imported by Airflow.
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(SCRIPT_DIR, "..", "..", "data-pipeline", ".env"))
+
 
 # Base connection info — schema gets specified separately per read/write below,
 # since we're reading from RAW but writing to CLEANED.
