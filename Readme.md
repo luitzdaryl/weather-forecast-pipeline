@@ -54,6 +54,7 @@ weather-forecast-pipeline/
 └── README.md
 ```
 
+
 ## Setup
 
 ### 1. Snowflake
