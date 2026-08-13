@@ -37,6 +37,8 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ../data-pipeline:/opt/airflow/data-pipeline
+      - ../spark:/opt/airflow/spark 
+
     ports:
       - "8081:8080"
     command: webserver
@@ -54,6 +56,7 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ../data-pipeline:/opt/airflow/data-pipeline
+      - ../spark:/opt/airflow/spark
     command: scheduler
 
 volumes:
