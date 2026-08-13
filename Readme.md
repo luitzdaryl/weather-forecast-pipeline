@@ -39,11 +39,18 @@ Apache Airflow orchestrates both steps hourly, in sequence.
 ```
 weather-forecast-pipeline/
 ├── data-pipeline/
-│   ├── sql/                # Snowflake schema setup scripts
-│   ├── scripts/             # Python ingestion scripts
-│   ├── .env.example         # template for required credentials
+│   ├── sql/                 # Snowflake schema setup scripts
+│   ├── scripts/              # Python ingestion scripts
+│   ├── .env.example          # template for required credentials
 │   └── requirements.txt
-├── ml-pipeline/              # forecasting model (coming in a later milestone)
+├── spark/
+│   ├── scripts/               # PySpark transformation scripts
+│   └── requirements.txt
+├── airflow/
+│   ├── dags/                   # Airflow DAG definitions
+│   ├── Dockerfile
+│   └── docker-compose.yml
+├── ml-pipeline/                  # forecasting model (coming in a later milestone)
 └── README.md
 ```
 
