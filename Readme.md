@@ -11,20 +11,25 @@ Open-Meteo API (live weather data)
   Python ingestion script
         │
         ▼
-   Snowflake (data warehouse)
-        ▲
+Snowflake — RAW schema (as-ingested data)
         │
-  Apache Airflow (schedules the ingestion)
+        ▼
+  Apache Spark (dedupe, decode weather codes, rolling averages)
+        │
+        ▼
+Snowflake — CLEANED schema (analysis-ready data)
+
+Apache Airflow orchestrates both steps hourly, in sequence.
 ```
 
-*(Spark and Kafka join this diagram in later milestones — see Roadmap below.)*
+*(Kafka join this diagram in later milestones — see Roadmap below.)*
 
 ## Tech Stack
 
 - **Snowflake** — cloud data warehouse, stores all historical weather readings
 - **Python** — fetches data from [Open-Meteo](https://open-meteo.com) (free, no API key required) and loads it into Snowflake
 - **Apache Airflow** — orchestrates and schedules the ingestion pipeline, running hourly in Docker
-- **Apache Spark** — data transformation/cleaning at scale *(planned)*
+- **Apache Spark** — cleans, deduplicates, and enriches raw weather data, computing rolling temperature averages via window functions
 - **Apache Kafka** — real-time streaming ingestion *(planned)*
 - **Scikit-learn / XGBoost** — forecasting model *(planned)*
 - **Streamlit** — dashboard + natural-language chatbot over the data, powered by a local Ollama model *(planned)*
@@ -84,7 +89,7 @@ Open `http://localhost:8081` (username/password: `admin` / `admin`) to view and 
 
 - [x] **Milestone 1** — Batch ingestion: Python script → Snowflake (manual run)
 - [x] **Milestone 1b** — Automate ingestion on a schedule with Apache Airflow
-- [ ] **Milestone 2** — Add Apache Spark for data transformation
+- [x] **Milestone 2** — Add Apache Spark for data transformation
 - [ ] **Milestone 3** — Add Apache Kafka for real-time streaming ingestion
 - [ ] **Milestone 4** — Train a forecasting model, build a Streamlit dashboard
 - [ ] **Milestone 5** — Add a natural-language chatbot over the data (local Ollama)
