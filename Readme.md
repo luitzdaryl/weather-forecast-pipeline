@@ -85,6 +85,20 @@ docker compose up --build
 
 Open `http://localhost:8081` (username/password: `admin` / `admin`) to view and trigger the `weather_ingestion` DAG.
 
+### 4. Spark transformation
+
+Runs automatically as the second step in the Airflow DAG, after ingestion. To run it standalone instead:
+
+```bash
+cd spark
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 scripts/transform_weather.py
+```
+
+Reads from `weather_db.raw.weather_observations`, and writes deduplicated, enriched data — including a human-readable weather description and a rolling 3-reading temperature average — to `weather_db.cleaned.weather_observations_cleaned`.
+
 ## Roadmap
 
 - [x] **Milestone 1** — Batch ingestion: Python script → Snowflake (manual run)
