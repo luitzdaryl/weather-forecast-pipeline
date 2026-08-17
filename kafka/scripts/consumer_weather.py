@@ -14,7 +14,6 @@ conf = {
     "enable.auto.commit": False,  # commit manually, only after a successful Snowflake insert
 }
 
-
 def main():
     consumer = Consumer(conf)
     consumer.subscribe(["weather-readings"])
@@ -38,7 +37,6 @@ def main():
         consumer.close()
 
     print(f"Done. Processed {processed} message(s).")
-
 
 if __name__ == "__main__":
     main()
