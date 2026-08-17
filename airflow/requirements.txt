@@ -2,3 +2,4 @@ snowflake-connector-python
 python-dotenv
 requests
 pyspark
+confluent-kafka

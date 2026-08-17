@@ -27,13 +27,14 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs  
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
 
   airflow-init:
     build: .
     image: weather-airflow:latest
     depends_on:
       - postgres
+      - kafka
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -53,8 +54,8 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ../data-pipeline:/opt/airflow/data-pipeline
-      - ../spark:/opt/airflow/spark 
-
+      - ../spark:/opt/airflow/spark
+      - ../kafka:/opt/airflow/kafka
     ports:
       - "8081:8080"
     command: webserver
@@ -73,6 +74,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ../data-pipeline:/opt/airflow/data-pipeline
       - ../spark:/opt/airflow/spark
+      - ../kafka:/opt/airflow/kafka
     command: scheduler
 
 volumes:
