@@ -8,7 +8,13 @@ A data engineering pipeline that ingests live weather data, stores it in a cloud
 Open-Meteo API (live weather data)
         │
         ▼
-  Python ingestion script
+  Kafka Producer (fetches + publishes)
+        │
+        ▼
+  Kafka topic: weather-readings
+        │
+        ▼
+  Kafka Consumer (reads + inserts)
         │
         ▼
 Snowflake — RAW schema (as-ingested data)
@@ -19,10 +25,8 @@ Snowflake — RAW schema (as-ingested data)
         ▼
 Snowflake — CLEANED schema (analysis-ready data)
 
-Apache Airflow orchestrates both steps hourly, in sequence.
+Apache Airflow orchestrates all three steps hourly, in sequence.
 ```
-
-*(Kafka join this diagram in later milestones — see Roadmap below.)*
 
 ## Tech Stack
 
@@ -30,7 +34,7 @@ Apache Airflow orchestrates both steps hourly, in sequence.
 - **Python** — fetches data from [Open-Meteo](https://open-meteo.com) (free, no API key required) and loads it into Snowflake
 - **Apache Airflow** — orchestrates and schedules the ingestion pipeline, running hourly in Docker
 - **Apache Spark** — cleans, deduplicates, and enriches raw weather data, computing rolling temperature averages via window functions
-- **Apache Kafka** — real-time streaming ingestion *(planned)*
+- **Apache Kafka** — decouples ingestion from storage via a producer/consumer pattern, with offset-based delivery guarantees
 - **Scikit-learn / XGBoost** — forecasting model *(planned)*
 - **Streamlit** — dashboard + natural-language chatbot over the data, powered by a local Ollama model *(planned)*
 
@@ -112,7 +116,7 @@ Reads from `weather_db.raw.weather_observations`, and writes deduplicated, enric
 - [x] **Milestone 1** — Batch ingestion: Python script → Snowflake (manual run)
 - [x] **Milestone 1b** — Automate ingestion on a schedule with Apache Airflow
 - [x] **Milestone 2** — Add Apache Spark for data transformation
-- [ ] **Milestone 3** — Add Apache Kafka for real-time streaming ingestion
+- [x] **Milestone 3** — Add Apache Kafka for real-time streaming ingestion
 - [ ] **Milestone 4** — Train a forecasting model, build a Streamlit dashboard
 - [ ] **Milestone 5** — Add a natural-language chatbot over the data (local Ollama)
 
