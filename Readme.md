@@ -43,21 +43,34 @@ Apache Airflow orchestrates all three steps hourly, in sequence.
 ```
 weather-forecast-pipeline/
 ├── data-pipeline/
-│   ├── sql/                 # Snowflake schema setup scripts
-│   ├── scripts/              # Python ingestion scripts
-│   ├── .env.example          # template for required credentials
+│   ├── sql/
+│   │   ├── 01_setup_warehouse_db_table.sql   # warehouse, database, schema, raw table
+│   │   └── 02_setup_cleaned_schema.sql        # cleaned schema for Spark output
+│   ├── scripts/
+│   │   └── fetch_weather.py                    # fetch_weather() + insert_into_snowflake(), reused by Kafka
+│   ├── .env.example                              # template for required credentials
+│   ├── .gitignore
 │   └── requirements.txt
 ├── spark/
-│   ├── scripts/               # PySpark transformation scripts
+│   ├── scripts/
+│   │   └── transform_weather.py                # dedupe, decode weather codes, rolling averages
+│   └── requirements.txt
+├── kafka/
+│   ├── scripts/
+│   │   ├── producer_weather.py                 # fetches + publishes to weather-readings topic
+│   │   └── consumer_weather.py                  # consumes + inserts into Snowflake
+│   ├── docker-compose.yml                         # standalone broker, for local testing only
 │   └── requirements.txt
 ├── airflow/
-│   ├── dags/                   # Airflow DAG definitions
-│   ├── Dockerfile
-│   └── docker-compose.yml
-├── ml-pipeline/                  # forecasting model (coming in a later milestone)
+│   ├── dags/
+│   │   └── weather_dag.py                       # produce_weather >> consume_weather >> transform_weather
+│   ├── logs/
+│   ├── Dockerfile                                 # extends apache/airflow, adds JDK 17 + pip deps
+│   ├── requirements.txt
+│   └── docker-compose.yml                         # postgres, kafka, airflow-init/webserver/scheduler
+├── ml-pipeline/                                     # forecasting model (Milestone 4)
 └── README.md
 ```
-
 
 ## Setup
 
@@ -110,6 +123,21 @@ python3 scripts/transform_weather.py
 ```
 
 Reads from `weather_db.raw.weather_observations`, and writes deduplicated, enriched data — including a human-readable weather description and a rolling 3-reading temperature average — to `weather_db.cleaned.weather_observations_cleaned`.
+
+### 5. Kafka (decoupled ingestion)
+
+Runs automatically as the first two steps in the Airflow DAG — a producer publishes fetched weather data to a topic, a separate consumer reads it and inserts into Snowflake. To run standalone instead:
+
+```bash
+cd kafka
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 scripts/producer_weather.py
+python3 scripts/consumer_weather.py
+```
+
+The broker itself runs as part of `airflow/docker-compose.yml`.
 
 ## Roadmap
 
