@@ -50,7 +50,12 @@ with DAG(
     tags=["weather", "ingestion", "kafka", "transformation"],
 ) as dag:
 
-    produce = PythonOperator(task_id="produce_weather", python_callable=run_produce)
+    produce = PythonOperator(
+        task_id="produce_weather",
+        python_callable=run_produce,
+        retries=5,
+        retry_delay=timedelta(minutes=1),
+    )
     consume = PythonOperator(task_id="consume_weather", python_callable=run_consume)
     transform = PythonOperator(task_id="transform_weather", python_callable=run_transform)
 

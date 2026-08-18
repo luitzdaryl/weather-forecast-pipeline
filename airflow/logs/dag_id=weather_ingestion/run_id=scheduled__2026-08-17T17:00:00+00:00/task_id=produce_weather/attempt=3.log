@@ -1,0 +1,21 @@
+[2026-08-17T18:19:05.110+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2026-08-17T18:19:05.117+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: weather_ingestion.produce_weather scheduled__2026-08-17T17:00:00+00:00 [queued]>
+[2026-08-17T18:19:05.119+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: weather_ingestion.produce_weather scheduled__2026-08-17T17:00:00+00:00 [queued]>
+[2026-08-17T18:19:05.120+0000] {taskinstance.py:2866} INFO - Starting attempt 3 of 4
+[2026-08-17T18:19:05.124+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): produce_weather> on 2026-08-17 17:00:00+00:00
+[2026-08-17T18:19:05.126+0000] {standard_task_runner.py:72} INFO - Started process 6081 to run task
+[2026-08-17T18:19:05.128+0000] {standard_task_runner.py:104} INFO - Running: ['***', 'tasks', 'run', 'weather_ingestion', 'produce_weather', 'scheduled__2026-08-17T17:00:00+00:00', '--job-id', '47', '--raw', '--subdir', 'DAGS_FOLDER/weather_dag.py', '--cfg-path', '/tmp/tmpr7e0qn_f']
+[2026-08-17T18:19:05.130+0000] {standard_task_runner.py:105} INFO - Job 47: Subtask produce_weather
+[2026-08-17T18:19:05.152+0000] {task_command.py:467} INFO - Running <TaskInstance: weather_ingestion.produce_weather scheduled__2026-08-17T17:00:00+00:00 [running]> on host 827737eaffc5
+[2026-08-17T18:19:05.186+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='weather_ingestion' AIRFLOW_CTX_TASK_ID='produce_weather' AIRFLOW_CTX_EXECUTION_DATE='2026-08-17T17:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='3' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-08-17T17:00:00+00:00'
+[2026-08-17T18:19:05.186+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2026-08-17T18:19:14.190+0000] {logging_mixin.py:190} INFO - Fetched: {'city': 'Taipei', 'observed_at': '2026-08-17T18:15', 'temperature_c': 26.9, 'humidity_pct': 86, 'wind_speed_kmh': 14.2, 'weather_code': 0}
+[2026-08-17T18:37:36.198+0000] {job.py:229} INFO - Heartbeat recovered after 994.63 seconds
+[2026-08-17T18:55:34.995+0000] {job.py:229} INFO - Heartbeat recovered after 932.24 seconds
+[2026-08-17T18:56:11.569+0000] {logging_mixin.py:190} INFO - Delivery failed: KafkaError{code=_MSG_TIMED_OUT,val=-192,str="Local: Message timed out"}
+[2026-08-17T18:56:11.579+0000] {python.py:240} INFO - Done. Returned value was: None
+[2026-08-17T18:56:11.651+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2026-08-17T18:56:11.652+0000] {taskinstance.py:352} INFO - Marking task as SUCCESS. dag_id=weather_ingestion, task_id=produce_weather, run_id=scheduled__2026-08-17T17:00:00+00:00, execution_date=20260817T170000, start_date=20260817T181905, end_date=20260817T185611
+[2026-08-17T18:56:11.714+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2026-08-17T18:56:11.735+0000] {taskinstance.py:3895} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-08-17T18:56:11.736+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

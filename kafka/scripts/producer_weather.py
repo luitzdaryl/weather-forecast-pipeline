@@ -24,6 +24,7 @@ def main():
     producer.produce(
         "weather-readings",
         value=json.dumps(reading, default=str).encode("utf-8"),
+       
         callback=delivery_report,
     )
     producer.flush()
