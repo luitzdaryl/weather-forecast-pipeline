@@ -33,16 +33,19 @@ def load_data():
     finally:
         conn.close()
 
-
-def engineer_features(df):
-    df = df.sort_values(["CITY", "OBSERVED_AT"]).reset_index(drop=True)
-
-    # Cyclical encoding of hour-of-day: raw hour (0-23) is misleading to a model,
-    # since hour 23 and hour 0 are numerically far apart but temporally adjacent.
-    # Representing hour as a point on a circle fixes this.
+def add_hour_features(df):
+    """Cyclical hour-of-day encoding — shared between training and live
+    inference, so the Streamlit app never has to re-derive this separately."""
+    df = df.copy()
     hour = df["OBSERVED_AT"].dt.hour
     df["HOUR_SIN"] = np.sin(2 * np.pi * hour / 24)
     df["HOUR_COS"] = np.cos(2 * np.pi * hour / 24)
+    return df
+
+
+def engineer_features(df):
+    df = df.sort_values(["CITY", "OBSERVED_AT"]).reset_index(drop=True)
+    df = add_hour_features(df)
 
     # The target: next reading's temperature, per city (groupby prevents one
     # city's last row from leaking into another city's first row).
