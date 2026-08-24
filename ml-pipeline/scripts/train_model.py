@@ -11,7 +11,6 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(SCRIPT_DIR, "..", "..", "data-pipeline", ".env"))
 MODEL_PATH = os.path.join(SCRIPT_DIR, "..", "models", "temp_forecast_model.pkl")
 
-
 def load_data():
     conn = snowflake.connector.connect(
         account=os.environ["SNOWFLAKE_ACCOUNT"],
@@ -53,7 +52,6 @@ def engineer_features(df):
     df = df.dropna(subset=["TARGET_NEXT_TEMP"])
     return df
 
-
 def train_and_evaluate(df):
     feature_cols = ["TEMPERATURE_C", "HUMIDITY_PCT", "WIND_SPEED_KMH",
                      "TEMP_ROLLING_AVG_C", "HOUR_SIN", "HOUR_COS"]
@@ -91,7 +89,6 @@ def train_and_evaluate(df):
 
     return model, feature_cols
 
-
 def main():
     df = load_data()
     print(f"Loaded {len(df)} rows")
@@ -102,7 +99,6 @@ def main():
 
     joblib.dump({"model": model, "feature_cols": feature_cols}, MODEL_PATH)
     print(f"Model saved to {MODEL_PATH}")
-
 
 if __name__ == "__main__":
     main()
