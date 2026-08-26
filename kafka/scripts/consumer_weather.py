@@ -38,5 +38,13 @@ def main():
 
     print(f"Done. Processed {processed} message(s).")
 
+    if processed == 0:
+        raise RuntimeError(
+            "Consumer processed zero messages — the producer may have failed "
+            "silently, or the topic/broker may have reset unexpectedly."
+        )
+
 if __name__ == "__main__":
     main()
+
+    
