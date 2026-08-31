@@ -5,6 +5,7 @@ import pandas as pd
 import snowflake.connector
 import streamlit as st
 from dotenv import load_dotenv
+from chatbot import get_ollama_models, generate_sql, is_safe_select, generate_answer
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
