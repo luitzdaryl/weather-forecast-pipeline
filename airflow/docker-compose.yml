@@ -32,8 +32,6 @@ services:
       - kafka-data:/tmp/kraft-combined-logs
 
   airflow-init:
-
-  airflow-init:
     build: .
     image: weather-airflow:latest
     depends_on:
