@@ -13,12 +13,15 @@ BOOTSTRAP_SERVERS = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092") 
 
 producer = Producer({"bootstrap.servers": BOOTSTRAP_SERVERS})   # ← CHANGED from the hardcoded string
 
+delivery_failed = False
+
 def delivery_report(err, msg):
+    global delivery_failed
     if err is not None:
         print(f"Delivery failed: {err}")
+        delivery_failed = True
     else:
         print(f"Delivered to {msg.topic()} [partition {msg.partition()}] at offset {msg.offset()}")
-
 
 def main():
     reading = fetch_weather()
@@ -27,10 +30,14 @@ def main():
     producer.produce(
         "weather-readings",
         value=json.dumps(reading, default=str).encode("utf-8"),
-       
         callback=delivery_report,
     )
-    producer.flush()
+    remaining = producer.flush(timeout=10)
+
+    if remaining > 0 or delivery_failed:
+        raise RuntimeError(
+            f"Kafka delivery failed (undelivered={remaining}, error_seen={delivery_failed})"
+        )
 
 if __name__ == "__main__":
     main()
