@@ -168,6 +168,19 @@ The model predicts next-hour temperature using a Random Forest, trained on Snowf
 - [x] **Milestone 4** — Train a forecasting model, build a Streamlit dashboard
 - [ ] **Milestone 5** — Add a natural-language chatbot over the data (local Ollama)
 
+## Known Issues & Lessons Learned
+
+**Silent Kafka failures (Aug 17 – Aug 31, 2026):** after consolidating Kafka into the Airflow Docker Compose stack, the producer and consumer scripts still had `localhost:9092` hardcoded as the broker address. Inside a container, `localhost` refers to the container itself, not the separate Kafka broker container — so every produce/consume attempt silently failed to connect. Because the original scripts treated "zero messages processed" as a successful, error-free outcome, Airflow's dashboard showed consistent green checkmarks for two weeks while no new data was actually being ingested.
+
+**Root cause:** a hardcoded network address that should have been an environment variable, combined with error handling that didn't distinguish "ran successfully" from "did nothing."
+
+**Fix:** 
+- Both scripts now read the broker address from a `KAFKA_BOOTSTRAP_SERVERS` environment variable, falling back to `localhost:9092` only for local standalone testing.
+- Both scripts now raise an explicit error if zero messages are produced/consumed, rather than exiting cleanly — a task that does nothing should look like a failure, not a success.
+- The Kafka broker's data directory is now backed by a named Docker volume, so a container restart doesn't silently reset all topics and offsets.
+
+**Takeaway:** dashboards and monitoring only catch what they're explicitly designed to check for. A task can report success while accomplishing nothing if failure conditions aren't defined precisely — worth validating end-to-end data freshness (e.g., checking `MAX(timestamp)` in the destination table), not just orchestration-level success/failure status.
+
 ## License
 
 MIT
