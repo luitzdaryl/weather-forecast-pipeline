@@ -145,7 +145,7 @@ The broker itself runs as part of `airflow/docker-compose.yml`.
 - [x] **Milestone 1b** — Automate ingestion on a schedule with Apache Airflow
 - [x] **Milestone 2** — Add Apache Spark for data transformation
 - [x] **Milestone 3** — Add Apache Kafka for real-time streaming ingestion
-- [ ] **Milestone 4** — Train a forecasting model, build a Streamlit dashboard
+- [x] **Milestone 4** — Train a forecasting model, build a Streamlit dashboard
 - [ ] **Milestone 5** — Add a natural-language chatbot over the data (local Ollama)
 
 ## License
