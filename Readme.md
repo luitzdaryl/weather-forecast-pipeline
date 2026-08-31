@@ -24,8 +24,15 @@ Snowflake — RAW schema (as-ingested data)
         │
         ▼
 Snowflake — CLEANED schema (analysis-ready data)
+        │
+        ▼
+  Scikit-learn model (next-hour temperature forecast)
+        │
+        ▼
+  Streamlit dashboard
 
-Apache Airflow orchestrates all three steps hourly, in sequence.
+Apache Airflow orchestrates ingestion and transformation hourly.
+Model training and the dashboard currently run standalone (see Roadmap).
 ```
 
 ## Tech Stack
