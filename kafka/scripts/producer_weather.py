@@ -1,3 +1,5 @@
+# producer_weather.py
+
 import json
 import os
 import sys
@@ -7,7 +9,8 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(SCRIPT_DIR, "..", "..", "data-pipeline", "scripts"))
 from fetch_weather import fetch_weather
 
-BOOTSTRAP_SERVERS = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+producer = Producer({"bootstrap.servers": "localhost:9092"})
+
 
 def delivery_report(err, msg):
     if err is not None:
