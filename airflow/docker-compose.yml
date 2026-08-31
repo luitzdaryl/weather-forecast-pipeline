@@ -81,3 +81,4 @@ services:
 
 volumes:
   postgres-db-volume:
+  kafka-data:
