@@ -14,7 +14,7 @@ from train_model import add_hour_features  # reuse the EXACT training logic
 load_dotenv(os.path.join(SCRIPT_DIR, "..", "..", "data-pipeline", ".env"))
 MODEL_PATH = os.path.join(SCRIPT_DIR, "..", "models", "temp_forecast_model.pkl")
 
-st.set_page_config(page_title="Weather Forecast Dashboard", page_icon="🌤️")
+st.set_page_config(page_title="Weather Forecast Dashboard", page_icon="🌤️", layout="wide")
 
 @st.cache_resource
 def load_model():
