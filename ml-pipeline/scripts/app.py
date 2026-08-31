@@ -67,90 +67,92 @@ def run_snowflake_query(sql):
 
 
 # Streamlit app layout                
-
 st.title("🌤️ Weather Forecast Dashboard")
 
-city = st.selectbox("City", ["Taipei"])
-df = load_recent_data(city)
+left_col, right_col = st.columns([1.3, 1])
 
-if df.empty:
-    st.warning("No data yet — check back after the pipeline runs.")
-    st.stop()
+with left_col:
+    city = st.selectbox("City", ["Taipei"])
+    df = load_recent_data(city)
 
-latest = df.iloc[-1]
+    if df.empty:
+        st.warning("No data yet — check back after the pipeline runs.")
+        st.stop()
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Latest Temperature", f"{latest['TEMPERATURE_C']:.1f} °C")
-col2.metric("Humidity", f"{latest['HUMIDITY_PCT']:.0f}%")
-col3.metric("Conditions", latest["WEATHER_DESCRIPTION"])
-st.caption(f"Last observed: {latest['OBSERVED_AT']}")
+    latest = df.iloc[-1]
 
-st.subheader("Temperature history")
-st.line_chart(df.set_index("OBSERVED_AT")["TEMPERATURE_C"])
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Latest Temperature", f"{latest['TEMPERATURE_C']:.1f} °C")
+    m2.metric("Humidity", f"{latest['HUMIDITY_PCT']:.0f}%")
+    m3.metric("Conditions", latest["WEATHER_DESCRIPTION"])
+    st.caption(f"Last observed: {latest['OBSERVED_AT']}")
 
-st.subheader("Next-hour forecast")
+    st.subheader("Temperature history")
+    st.line_chart(df.set_index("OBSERVED_AT")["TEMPERATURE_C"])
 
-model, feature_cols = load_model()
+    st.subheader("Next-hour forecast")
+    model, feature_cols = load_model()
+    latest_df = add_hour_features(pd.DataFrame([latest]))
+    X_live = latest_df[feature_cols]
+    prediction = model.predict(X_live)[0]
+    delta = prediction - latest["TEMPERATURE_C"]
 
-latest_df = add_hour_features(pd.DataFrame([latest]))
-X_live = latest_df[feature_cols]
-prediction = model.predict(X_live)[0]
-delta = prediction - latest["TEMPERATURE_C"]
+    st.metric(
+        "Predicted temperature (next hour)",
+        f"{prediction:.1f} °C",
+        delta=f"{delta:+.1f} °C vs now",
+    )
+    st.caption(
+        "Random Forest model, trained on Snowflake's cleaned weather data. "
+        "Evaluated against a naive persistence baseline during training — "
+        "see ml-pipeline/scripts/train_model.py."
+    )
 
-st.metric(
-    "Predicted temperature (next hour)",
-    f"{prediction:.1f} °C",
-    delta=f"{delta:+.1f} °C vs now",
-)
+with right_col:
+    st.subheader("💬 Ask your data")
 
-st.caption(
-    "Random Forest model, trained on Snowflake's cleaned weather data. "
-    "Evaluated against a naive persistence baseline during training — "
-    "see ml-pipeline/scripts/train_model.py."
-)
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
 
-# Chatbot interface
-st.subheader("💬 Ask your data")
+    available_models = get_ollama_models()
+    chat_model = st.selectbox("Model", available_models, key="chat_model")
 
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+    messages = st.container(height=420)
+    with messages:
+        for msg in st.session_state.chat_history:
+            with st.chat_message(msg["role"]):
+                st.write(msg["content"])
 
-available_models = get_ollama_models()
-chat_model = st.selectbox("Model", available_models, key="chat_model")
+    user_question = st.chat_input("Ask something about the weather data...")
 
-for msg in st.session_state.chat_history:
-    with st.chat_message(msg["role"]):
-        st.write(msg["content"])
+    if user_question:
+        st.session_state.chat_history.append({"role": "user", "content": user_question})
+        with messages:
+            with st.chat_message("user"):
+                st.write(user_question)
 
-user_question = st.chat_input("Ask something about the weather data...")
+            with st.chat_message("assistant"):
+                with st.spinner("Writing SQL query..."):
+                    sql = generate_sql(chat_model, user_question)
 
-if user_question:
-    st.session_state.chat_history.append({"role": "user", "content": user_question})
-    with st.chat_message("user"):
-        st.write(user_question)
+                safe, reason = is_safe_select(sql)
+                if not safe:
+                    answer = f"I generated a query I'm not comfortable running: {reason}\n\n```sql\n{sql}\n```"
+                    st.write(answer)
+                else:
+                    with st.expander("Generated SQL"):
+                        st.code(sql, language="sql")
+                    try:
+                        with st.spinner("Querying Snowflake..."):
+                            result_df = run_snowflake_query(sql)
+                        with st.spinner("Writing answer..."):
+                            answer = generate_answer(chat_model, user_question, sql, result_df)
+                        st.write(answer)
+                        if not result_df.empty:
+                            with st.expander("Raw results"):
+                                st.dataframe(result_df)
+                    except Exception as e:
+                        answer = f"The query failed to run: {e}"
+                        st.write(answer)
 
-    with st.chat_message("assistant"):
-        with st.spinner("Writing SQL query..."):
-            sql = generate_sql(chat_model, user_question)
-
-        safe, reason = is_safe_select(sql)
-        if not safe:
-            answer = f"I generated a query I'm not comfortable running: {reason}\n\n```sql\n{sql}\n```"
-            st.write(answer)
-        else:
-            with st.expander("Generated SQL"):
-                st.code(sql, language="sql")
-            try:
-                with st.spinner("Querying Snowflake..."):
-                    result_df = run_snowflake_query(sql)
-                with st.spinner("Writing answer..."):
-                    answer = generate_answer(chat_model, user_question, sql, result_df)
-                st.write(answer)
-                if not result_df.empty:
-                    with st.expander("Raw results"):
-                        st.dataframe(result_df)
-            except Exception as e:
-                answer = f"The query failed to run: {e}"
-                st.write(answer)
-
-    st.session_state.chat_history.append({"role": "assistant", "content": answer})
+        st.session_state.chat_history.append({"role": "assistant", "content": answer})
