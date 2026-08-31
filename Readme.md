@@ -146,6 +146,19 @@ python3 scripts/consumer_weather.py
 
 The broker itself runs as part of `airflow/docker-compose.yml`.
 
+### 6. ML pipeline (forecasting + dashboard)
+
+```bash
+cd ml-pipeline
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 scripts/train_model.py    # trains and saves the model
+streamlit run scripts/app.py      # launches the dashboard
+```
+
+The model predicts next-hour temperature using a Random Forest, trained on Snowflake's cleaned data. It's evaluated against a naive "next hour = current temperature" baseline during training — the model must beat this baseline to be considered useful. Current result: **MAE 0.71°C vs. a 0.78°C baseline**, on ~250 rows of collected data. Accuracy is expected to improve as the pipeline continues collecting data over time.
+
 ## Roadmap
 
 - [x] **Milestone 1** — Batch ingestion: Python script → Snowflake (manual run)
