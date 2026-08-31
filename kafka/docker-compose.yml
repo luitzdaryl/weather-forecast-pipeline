@@ -1,7 +1,8 @@
 services:
- kafka:
+  kafka:
     image: apache/kafka:latest
     container_name: kafka-broker
+    user: "1000:1000"
     ports:
       - "9092:9092"
     environment:
@@ -15,4 +16,4 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
     volumes:
-      - kafka-data:/tmp/kraft-combined-logs
+      - kafka-data:/tmp/kraft-combined-logs      
