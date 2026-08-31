@@ -35,8 +35,8 @@ Apache Airflow orchestrates all three steps hourly, in sequence.
 - **Apache Airflow** — orchestrates and schedules the ingestion pipeline, running hourly in Docker
 - **Apache Spark** — cleans, deduplicates, and enriches raw weather data, computing rolling temperature averages via window functions
 - **Apache Kafka** — decouples ingestion from storage via a producer/consumer pattern, with offset-based delivery guarantees
-- **Scikit-learn / XGBoost** — forecasting model *(planned)*
-- **Streamlit** — dashboard + natural-language chatbot over the data, powered by a local Ollama model *(planned)*
+- **Scikit-learn** — Random Forest model predicting next-hour temperature, evaluated against a naive persistence baseline to confirm it adds real value
+- **Streamlit** — dashboard showing live conditions, temperature history, and the model's next-hour forecast
 
 ## Project Structure
 
