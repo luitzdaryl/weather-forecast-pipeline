@@ -16,6 +16,7 @@ services:
   kafka:
     image: apache/kafka:latest
     container_name: kafka-broker
+    restart: always
     ports:
       - "9092:9092"
     environment:
@@ -28,8 +29,6 @@ services:
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
-    volumes:
-      - kafka-data:/tmp/kraft-combined-logs
 
   airflow-init:
     build: .
@@ -52,6 +51,7 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    restart: always  
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
@@ -71,6 +71,7 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      restart: always
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
@@ -81,4 +82,3 @@ services:
 
 volumes:
   postgres-db-volume:
-  kafka-data:
