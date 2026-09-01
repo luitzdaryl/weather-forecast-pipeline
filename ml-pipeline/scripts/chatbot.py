@@ -17,6 +17,9 @@ Columns:
 - WEATHER_DESCRIPTION (string) — human-readable weather description, e.g. "Clear sky", "Light drizzle"
 - TEMP_ROLLING_AVG_C (float) — 3-reading rolling average temperature
 - INGESTED_AT (timestamp) — when the row was loaded into Snowflake
+
+Note: OBSERVED_AT is stored in UTC. When filtering by "today", "this week", etc.,
+compare against CURRENT_TIMESTAMP() converted to UTC, not CURRENT_DATE() directly.
 """
 
 FORBIDDEN_KEYWORDS = [
