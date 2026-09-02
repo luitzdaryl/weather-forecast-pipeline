@@ -166,7 +166,7 @@ The model predicts next-hour temperature using a Random Forest, trained on Snowf
 - [x] **Milestone 2** — Add Apache Spark for data transformation
 - [x] **Milestone 3** — Add Apache Kafka for real-time streaming ingestion
 - [x] **Milestone 4** — Train a forecasting model, build a Streamlit dashboard
-- [ ] **Milestone 5** — Add a natural-language chatbot over the data (local Ollama)
+- [x] **Milestone 5** — Add a natural-language chatbot over the data (local Ollama)
 
 ## Known Issues & Lessons Learned
 
