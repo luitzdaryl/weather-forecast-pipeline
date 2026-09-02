@@ -79,7 +79,8 @@ weather-forecast-pipeline/
 └── README.md
 ```
 
-## Setup
+
+## How the system was build???
 
 ### 1. Snowflake
 
@@ -180,6 +181,98 @@ The model predicts next-hour temperature using a Random Forest, trained on Snowf
 - The Kafka broker's data directory is now backed by a named Docker volume, so a container restart doesn't silently reset all topics and offsets.
 
 **Takeaway:** dashboards and monitoring only catch what they're explicitly designed to check for. A task can report success while accomplishing nothing if failure conditions aren't defined precisely — worth validating end-to-end data freshness (e.g., checking `MAX(timestamp)` in the destination table), not just orchestration-level success/failure status.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) (running)
+- Python 3.10+
+- [Ollama](https://ollama.com), installed and running, with at least one model pulled (`ollama pull llama3.2`)
+- A [Snowflake trial account](https://signup.snowflake.com) (no card required)
+- Git
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/yourusername/weather-forecast-pipeline.git
+cd weather-forecast-pipeline
+```
+
+### 2. Set up Snowflake
+
+Open a Snowflake worksheet and run these two files, in order:
+
+```sql
+-- paste and run:
+data-pipeline/sql/01_setup_warehouse_db_table.sql
+data-pipeline/sql/02_setup_cleaned_schema.sql
+```
+
+This creates the warehouse, database, `RAW` and `CLEANED` schemas, and tables.
+
+### 3. Configure credentials
+
+```bash
+cp data-pipeline/.env.example data-pipeline/.env
+```
+
+Edit `data-pipeline/.env` and fill in your real Snowflake account identifier, username, and password. **This single file is the only place credentials live** — every other component (Spark, Kafka, Airflow, the ML pipeline) reads from it directly.
+
+### 4. Start the automated pipeline
+
+```bash
+cd airflow
+docker compose up --build -d
+```
+
+This builds and starts everything: Postgres (Airflow's internal metadata store), the Kafka broker, and the Airflow scheduler/webserver. First run takes a few minutes (installing Java, Python packages, and pulling images).
+
+Open [http://localhost:8081](http://localhost:8081) — log in with `admin` / `admin`. Find `weather_ingestion` in the DAG list, **unpause it** (toggle on the left), then click **▶ Trigger DAG** a few times over the next several minutes to seed some initial data rather than waiting for the hourly schedule.
+
+### 5. Verify data is flowing
+
+In Snowsight:
+
+```sql
+SELECT COUNT(*), MAX(OBSERVED_AT) FROM weather_db.raw.weather_observations;
+SELECT COUNT(*), MAX(OBSERVED_AT) FROM weather_db.cleaned.weather_observations_cleaned;
+```
+
+Both should show a growing row count and a recent timestamp.
+
+### 6. Run the ML model and dashboard
+
+```bash
+cd ../ml-pipeline
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 scripts/train_model.py
+streamlit run scripts/app.py
+```
+
+Opens automatically at `http://localhost:8501`. Note: with only a handful of rows, the model and chatbot will work but won't be very accurate yet — both improve automatically as the pipeline (Step 4) keeps running in the background.
+
+---
+
+## Everyday operation
+
+```bash
+cd airflow
+docker compose up -d       # start the pipeline
+docker compose down        # stop it
+docker compose logs -f     # watch logs live
+```
+
+No rebuild (`--build`) needed unless you've changed code in `airflow/`, `data-pipeline/`, `spark/`, or `kafka/`.
+
+## Troubleshooting
+
+If something isn't working, check **Known Issues & Lessons Learned** below first — it documents the real failure modes this pipeline has actually hit and how they were diagnosed and fixed.
+---
 
 ## License
 
