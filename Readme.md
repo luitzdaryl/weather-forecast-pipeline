@@ -79,7 +79,6 @@ weather-forecast-pipeline/
 └── README.md
 ```
 
-
 ## How the system was build???
 
 ### 1. Snowflake
@@ -272,6 +271,62 @@ No rebuild (`--build`) needed unless you've changed code in `airflow/`, `data-pi
 ## Troubleshooting
 
 If something isn't working, check **Known Issues & Lessons Learned** below first — it documents the real failure modes this pipeline has actually hit and how they were diagnosed and fixed.
+---
+
+
+## Running Individual Components Standalone (development/testing only)
+
+The steps above are all you need for normal use — Docker runs everything together. The sections below are for developing or debugging one piece in isolation, the way each was originally built and tested during this project. None of this is required for a working install.
+
+All three require `data-pipeline/.env` to already be configured (Step 3 above).
+
+### Data ingestion only
+
+Fetches one live reading and inserts it directly into Snowflake, bypassing Kafka entirely.
+
+```bash
+cd data-pipeline
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 scripts/fetch_weather.py
+```
+
+### Spark transformation only
+
+Reads from `RAW`, transforms, writes to `CLEANED`. Requires Java 17 locally (`brew install openjdk@17` on Mac) — Spark needs a JVM to run, separate from Python itself.
+
+```bash
+cd spark
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 scripts/transform_weather.py
+```
+
+First run downloads the Snowflake Spark connector JARs (~30s); cached after that.
+
+### Kafka producer/consumer only
+
+**Requires the Airflow stack already running** (`cd airflow && docker compose up -d`) — that's what provides the actual Kafka broker, exposed to your host machine at `localhost:9092`. There's no separate standalone broker anymore; the earlier standalone `kafka/docker-compose.yml` was removed after it caused confusion by silently duplicating (and drifting out of sync with) the real broker config in `airflow/docker-compose.yml` — see **Known Issues** below.
+
+```bash
+cd kafka
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# publish one reading to the topic
+python3 scripts/producer_weather.py
+
+# read it back and insert into Snowflake
+python3 scripts/consumer_weather.py
+```
+
+### ML pipeline only
+
+Already covered in Step 6 above — training and the dashboard were always meant to run this way, not inside Docker.
+
 ---
 
 ## License
